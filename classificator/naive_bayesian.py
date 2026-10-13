@@ -35,7 +35,7 @@ class NaiveBayesianClassificator:
         
         print(result)
         # get class name
-        pred_prob = 0
+        pred_prob = 0  # the probability is not the real probability, beacause we don not divide it by P(X)
         pred_class = 0
         for k,v in result.items():
             if v > pred_prob:
