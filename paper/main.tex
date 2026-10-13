@@ -9,5 +9,47 @@
 	\tableofcontents
 	\newpage
 	
-	\section{title}
+
+\section{Abstract}
+	This paper investigates Naive Bayes Classification (NBC) and compares it with other classification methods. Direct implementation of NBC may suffer from the curse of dimensionality, which can significantly degrade its performance and even render it ineffective. This issue arises because $P(c)$ or $P(x)$ may become zero when the dataset contains no corresponding samples, resulting in incorrect class predictions.
+	
+	This report investigates how to mitigate the curse of dimensionality and improve the effectiveness of NBC.
+
+\section{Extending Naive Bayes Classification}
+	NBC aims to calculate
+	\[
+	c = \arg\max_c P(c \mid x)
+	= \arg\max_c P(x \mid c)P(c),
+	\]
+	where $x$ denotes the value of the input feature $X$, and $c$ refers to the class or label predicted by the model. To enhance its practical applicability, NBC must be extended to handle high-dimensional feature spaces. Specifically,
+	\[
+	c = \arg\max_c P(c \mid x_1, x_2, \ldots)
+	= \arg\max_c P(x_1, x_2, \ldots \mid c)P(c),
+	\]
+	where $x_1, x_2, \ldots$ denote the multidimensional input features
+	$X = (x_1, x_2, \ldots)$.
+	
+	To calculate $P(x_1, x_2, \ldots \mid c)$, we introduce the independence assumption, which states that all input features $x_1, x_2, \ldots$ are conditionally independent given the class $c$. Accordingly,
+	\[
+	P(x_1, x_2, \ldots \mid c)
+	= \prod_{i=1}^{n} P(x_i \mid c).
+	\]
+	For each feature $x_i$, we search the dataset and count the number of entries, denoted by $N_{ic}$, in which the corresponding feature value and class label equal $x_i$ and $c$, respectively. The conditional probability is then estimated as
+	\[
+	P(x_i \mid c) = \frac{N_{ic}}{N_c}.
+	\]
+	
+	To prevent $P(x_i \mid c)$ from becoming zero, Laplace smoothing (LS) is introduced. Instead of calculating
+	\[
+	P(x_i \mid c) = \frac{N_{ic}}{N_c},
+	\]
+	Laplace smoothing adds a smoothing term to the numerator and adjusts the denominator accordingly:
+	\[
+	P(x_i \mid c)
+	= \frac{N_{ic} + \alpha}{N_c + \alpha K},
+	\]
+	where $\alpha$ is the smoothing parameter and $K$ is the number of possible feature values.
+	
+	The rationale for using Laplace smoothing is that it is equivalent to adding $K$ entries to the dataset, with each entry representing one of the possible feature values.
+
 \end{document}
