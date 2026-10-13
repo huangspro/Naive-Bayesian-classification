@@ -9,7 +9,6 @@ class NaiveBayesianClassificator:
             self.p_c[self.dataset.get_in_train(i)[1]] += 1
         for k, v in self.p_c.items():
             self.p_c[k] = v / self.dataset.length()[1]
-        print(self.p_c)
     
     # calcullate P(xi|c) in train_set, X = (x1, x2, ...), c is the class
     # IMPORTANT, the order of features in X must be the same as the one in dataset 
@@ -33,7 +32,6 @@ class NaiveBayesianClassificator:
                 p_x_c *= self.get_p_xi_c(xi, xi_index, c)
             result[c] = p_x_c * self.p_c[c]
         
-        print(result)
         # get class name
         pred_prob = 0  # the probability is not the real probability, beacause we don not divide it by P(X)
         pred_class = 0

@@ -19,6 +19,7 @@ class BeanDataset:
             self.val_set = [index for index, i in enumerate(self.data) if i["partition"] == "TEST"]
         else:
             self.train_set = [i for i in range(0, len(self.data))]
+            self.val_set = [i for i in range(0, len(self.data))]
             
     def length(self):
         return (len(self.data), len(self.train_set), len(self.val_set))
