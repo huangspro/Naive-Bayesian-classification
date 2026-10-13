@@ -7,18 +7,19 @@ class NaiveBayesianClassificator:
     def fit(self):
         for i in self.dataset.train_set:
             self.p_c[self.dataset.get_in_train(i)[1]] += 1
-        for k,v in self.p_c.items():
-            v = v/self.dataset.length()[1]
+        for k, v in self.p_c.items():
+            self.p_c[k] = v / self.dataset.length()[1]
+        print(self.p_c)
     
     # calcullate P(xi|c) in train_set, X = (x1, x2, ...), c is the class
     # IMPORTANT, the order of features in X must be the same as the one in dataset 
-    def get_p_xi_c(self, xi, c):
+    def get_p_xi_c(self, xi, xi_index, c):
         c_number = 0
         xi_number = 0
         for i in self.dataset.train_set:
             if self.dataset.get_in_train(i)[1] == c:
                 c_number += 1
-                if self.dataset.get_in_train(i)[0] == xi:
+                if self.dataset.get_in_train(i)[0][xi_index] == xi:
                     xi_number += 1
         
         return xi_number/c_number
@@ -28,8 +29,8 @@ class NaiveBayesianClassificator:
         for c in result.keys():
             # calculate P(X|c)
             p_x_c = 1
-            for xi in inputs:
-                p_x_c *= self.get_p_xi_c(xi, c)
+            for xi_index, xi in enumerate(inputs):
+                p_x_c *= self.get_p_xi_c(xi, xi_index, c)
             result[c] = p_x_c * self.p_c[c]
         
         print(result)
