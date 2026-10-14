@@ -4,7 +4,7 @@ from dataset.dataset import BeanDataset
 D = BeanDataset("data/bean_train.csv")
 V = BeanDataset("data/bean_test.csv")
 
-NBC = NaiveBayesianClassificator(D)
+NBC = NaiveBayesianClassificator(D, False)
 NBC.fit()
 
 correction = 0
