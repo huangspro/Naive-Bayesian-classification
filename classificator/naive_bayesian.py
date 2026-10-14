@@ -1,37 +1,42 @@
 class NaiveBayesianClassificator:
     def __init__(self, dataset, LS = True):
         self.p_c = {"SEKER": 0, "BARBUNYA": 0, "BOMBAY": 0, "CALI": 0, "DERMASON": 0, "HOROZ": 0, "SIRA": 0}
+        self.p_xi_c = {}
+        self.xi = [[] for i in range(16)]
         self.LS = LS
         self.dataset = dataset
         
     def fit(self):
         for i in self.dataset.train_set:
-            self.p_c[self.dataset.get_in_train(i)[1]] += 1
+            tem = self.dataset.get_in_train(i)
+            self.p_c[tem[1]] += 1
+            for index, feature in enumerate(tem[0]):
+                if (tem[1], index, feature) in self.p_xi_c:
+                    self.p_xi_c[(tem[1], index, feature)] += 1
+                else:
+                    self.p_xi_c[(tem[1], index, feature)] = 0
+               
+        for k, v in self.p_xi_c.items(): 
+            self.p_xi_c[k] = self.p_xi_c[k]/self.p_c[k[0]]
         for k, v in self.p_c.items():
             self.p_c[k] = v / self.dataset.length()[1]
-    
-    # calcullate P(xi|c) in train_set, X = (x1, x2, ...), c is the class
-    # IMPORTANT, the order of features in X must be the same as the one in dataset 
-    def get_p_xi_c(self, xi, xi_index, c):
-        c_number = 0
-        xi_number = 0
-        for i in self.dataset.train_set:
-            if self.dataset.get_in_train(i)[1] == c:
-                c_number += 1
-                if self.dataset.get_in_train(i)[0][xi_index] == xi:
-                    xi_number += 1
-        
-        return xi_number/c_number
+            
+        # get each feature possible values
+        for k, v in self.p_xi_c.items(): 
+            if k[2] not in self.xi[k[1]]:
+                self.xi[k[1]].append(k[2])
         
     def predict(self, inputs):
-        result = {"SEKER": 0, "BARBUNYA": 0, "BOMBAY": 0, "CALI": 0, "DERMASON": 0, "HOROZ": 0, "SIRA": 0}
+        result = {"SEKER": 1, "BARBUNYA": 1, "BOMBAY": 1, "CALI": 1, "DERMASON": 1, "HOROZ": 1, "SIRA": 1}
+        # calculate P(X|c)
         for c in result.keys():
-            # calculate P(X|c)
-            p_x_c = 1
-            for xi_index, xi in enumerate(inputs):
-                p_x_c *= self.get_p_xi_c(xi, xi_index, c)
-            result[c] = p_x_c * self.p_c[c]
-        
+            for index, feature in enumerate(inputs):
+                if (c, index, feature) in self.p_xi_c:
+                    result[c] *= self.p_xi_c[(c, index, feature)]
+                else:
+                    result[c] *= 0
+            result[c] *= self.p_c[c]
+                
         # get class name
         pred_prob = 0  # the probability is not the real probability, beacause we don not divide it by P(X)
         pred_class = 0
