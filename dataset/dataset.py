@@ -10,7 +10,7 @@ class BeanDataset:
         self.load_data()
         
     def load_data(self):
-        print("dataset loading")
+        print("dataset loading: ", self.file_path)
         f = pd.read_csv(self.file_path)
         rows = f.to_dict(orient='records')
         self.data = rows
