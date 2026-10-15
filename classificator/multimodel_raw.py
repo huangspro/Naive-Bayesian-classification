@@ -9,7 +9,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier, GradientBoostingClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
 
-df = pd.read_csv("bean_raw.csv")
+df = pd.read_csv("../data/bean_raw.csv")
 drop_cols = ["id", "partition", "in_train_1000", "Class"]
 X, y = df.drop(columns=drop_cols), df["Class"]
 
@@ -32,6 +32,7 @@ models = {
 
 scores = {}
 for name, model in models.items():
+    print(name)
     steps = [SimpleImputer(strategy="median")]
     if name not in ["DT", "RF", "ET", "GB", "AdaBoost"]:
         steps.append(StandardScaler())

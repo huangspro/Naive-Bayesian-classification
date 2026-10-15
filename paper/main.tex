@@ -1,5 +1,7 @@
 \documentclass[10pt,a4paper]{report}
 \usepackage[T1]{fontenc}
+\usepackage{booktabs}
+\usepackage{hyperref}
 
 \title{Naive Bayesian Classification: A research}
 \author{Haoyu Huang}
@@ -11,11 +13,14 @@
 	
 
 \section{Abstract}
+	Machine Classification is an important domain in Machine Learning, with the aim of classifying samples based on input features. The classification model can be describe as $ \hat{y} = model(X), X \in R^n $. The train set of dataset is used to determine the parameters of the model and the test set is used to validate the model's performance. So far, multiple classification algorithms emerge such as Decision-tree, SVM, and so on. 
+
 	This paper investigates Naive Bayes Classification (NBC) and compares it with other classification methods. Direct implementation of NBC may suffer from the curse of dimensionality, which can significantly degrade its performance and even render it ineffective. This issue arises because $P(c)$ or $P(x)$ may become zero when the dataset contains no corresponding samples, resulting in incorrect class predictions.
 	
 	This report investigates how to mitigate the curse of dimensionality and improve the effectiveness of NBC.
 
 \section{Extending Naive Bayes Classification}
+	\subsection{High-dimensional NBC}
 	NBC aims to calculate
 	\[
 	c = \arg\max_c P(c \mid x)
@@ -39,11 +44,8 @@
 	P(x_i \mid c) = \frac{N_{ic}}{N_c}.
 	\]
 	
-	To prevent $P(x_i \mid c)$ from becoming zero, Laplace smoothing (LS) is introduced. Instead of calculating
-	\[
-	P(x_i \mid c) = \frac{N_{ic}}{N_c},
-	\]
-	Laplace smoothing adds a smoothing term to the numerator and adjusts the denominator accordingly:
+	\subsection{Laplace smoothing}
+	To prevent $P(x_i \mid c)$ from becoming zero, Laplace smoothing (LS) is introduced. Instead of calculating $ P(x_i \mid c) = \frac{N_{ic}}{N_c} $ ,Laplace smoothing adds a smoothing term to the numerator and adjusts the denominator accordingly:
 	\[
 	P(x_i \mid c)
 	= \frac{N_{ic} + \alpha}{N_c + \alpha K},
@@ -52,4 +54,80 @@
 	
 	The rationale for using Laplace smoothing is that it is equivalent to adding $K$ entries to the dataset, with each entry representing one of the possible feature values.
 
+\section{Exploration on real world data}
+	
+	Although discretization allows the Naive Bayes classifier (NBC) to handle numerical features, real-world data often contain continuous-valued attributes. Discretization may lead to information loss and introduce sensitivity to the choice of bin boundaries. To address this limitation, we extend the NBC to continuous numerical data by adopting the Gaussian Naive Bayes (GNB) model.
+	
+	Specifically, GNB assumes that, conditioned on the class label, each continuous feature follows a Gaussian distribution. For a feature $x_i$ and class $y=c$, the conditional probability density is given by
+	\begin{equation}
+		p(x_i \mid y=c)
+		=
+		\frac{1}{\sqrt{2\pi\sigma_{ic}^{2}}}
+		\exp\left(
+		-\frac{(x_i-\mu_{ic})^2}{2\sigma_{ic}^{2}}
+		\right),
+	\end{equation}
+	where $\mu_{ic}$ and $\sigma_{ic}^{2}$ denote the mean and variance of feature $x_i$ among training instances belonging to class $c$, respectively.
+	
+	For each class \(c\), the mean and variance of each continuous feature \(x_i\) are estimated using the training samples belonging to that class. Specifically, the class-conditional mean and variance are calculated as
+	
+	\[
+	\mu_{ic}=\frac{1}{N_c}\sum_{n:y_n=c}x_{ni},
+	\]
+	
+	\[
+	\sigma_{ic}^{2}=\frac{1}{N_c}\sum_{n:y_n=c}(x_{ni}-\mu_{ic})^2,
+	\]
+	
+	where \(N_c\) denotes the number of training samples in class \(c\). These estimates are then used to construct the Gaussian probability density for each feature conditioned on the class label.
+	
+	
+	The class-specific means and variances are estimated from the training data. By modeling continuous features through Gaussian probability densities, GNB can process numerical attributes directly without requiring discretization. This provides a straightforward extension of NBC for evaluating classification performance on real-world datasets.
+	
+	
+\section{Experiment}
+	We implement NBC on preprocessed dataset whose data points is discretized and we also compare it with other known machine classification algorithm using \textbf{sci-kit learn}, a python library. The result show as \autoref{tab:classifier_comparison1}. We also tested all the methods on the raw dataset whose data entries are continuous numerical data. The result is shown as \autoref{tab:classifier_comparison2}.
+	\begin{table}[htbp]
+		\centering
+		\caption{Performance Comparison of Different Classifiers}
+		\label{tab:classifier_comparison1}
+		\begin{tabular}{lc}
+			\toprule
+			\textbf{Classifier} & \textbf{Score} \\
+			\midrule
+			Support Vector Machine (SVM) & 0.8734 \\
+			Gradient Boosting (GB) & 0.8717 \\
+			Logistic Regression (LR) & 0.8703 \\
+			Random Forest (RF) & 0.8600 \\
+			Extra Trees Classifier (ET) & 0.8556 \\
+			Decision Tree (DT) & 0.8546 \\
+			\textbf{Naive Bayes with LS(NB-LS)(Ours)} & \textbf{0.8384} \\
+			\textbf{Naive Bayes without LS(NB)(Ours)} & \textbf{0.8384} \\
+			Adaptive Boosting (AdaBoost) & 0.8002 \\
+			K-Nearest Neighbors (KNN) & 0.7547 \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	\begin{table}[htbp]
+		\centering
+		\caption{Performance Comparison of Different Classifiers}
+		\label{tab:classifier_comparison2}
+		\begin{tabular}{lc}
+			\toprule
+			\textbf{Classifier} & \textbf{Score} \\
+			\midrule
+			Support Vector Machine (SVM) & 0.9295 \\
+			Logistic Regression (LR) & 0.9278 \\
+			Extra Trees Classifier (ET) & 0.9229 \\
+			Gradient Boosting (GB) & 0.9224 \\
+			Random Forest (RF) & 0.9222 \\
+			K-Nearest Neighbors (KNN) & 0.9182 \\
+			Naive Bayes (NB) & \\
+			Decision Tree (DT) & 0.8891 \\
+			Adaptive Boosting (AdaBoost) & 0.8382 \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+	
 \end{document}
