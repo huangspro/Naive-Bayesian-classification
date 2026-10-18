@@ -1,10 +1,10 @@
 from classificator.naive_bayesian import NaiveBayesianClassificator
 from dataset.dataset import BeanDataset
 
-D = BeanDataset("data/bean_train.csv")
+D = BeanDataset("data/bean_train_1000.csv")
 V = BeanDataset("data/bean_test.csv")
 
-NBC = NaiveBayesianClassificator(D, True)
+NBC = NaiveBayesianClassificator(D, True,400)
 NBC.fit()
 
 correction = 0

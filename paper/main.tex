@@ -1,32 +1,42 @@
-\documentclass[10pt,a4paper]{report}
+\documentclass[10pt,a4paper]{article}
+
 \usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
 \usepackage{booktabs}
+\usepackage{threeparttable}
 \usepackage{hyperref}
 
 \title{Naive Bayesian Classification: A research}
 \author{Haoyu Huang}
 
 \begin{document}
+	
 	\maketitle
+	\newpage
 	\tableofcontents
 	\newpage
 	
-
-\section{Abstract}
-	Machine Classification is an important domain in Machine Learning, with the aim of classifying samples based on input features. The classification model can be describe as $ \hat{y} = model(X), X \in R^n $. The train set of dataset is used to determine the parameters of the model and the test set is used to validate the model's performance. So far, multiple classification algorithms emerge such as Decision-tree, SVM, and so on. 
-
-	This paper investigates Naive Bayes Classification (NBC) and compares it with other classification methods. Direct implementation of NBC may suffer from the curse of dimensionality, which can significantly degrade its performance and even render it ineffective. This issue arises because $P(c)$ or $P(x)$ may become zero when the dataset contains no corresponding samples, resulting in incorrect class predictions.
+	\section{Abstract}
 	
-	This report investigates how to mitigate the curse of dimensionality and improve the effectiveness of NBC.
-
-\section{Extending Naive Bayes Classification}
-	\subsection{High-dimensional NBC}
-	NBC aims to calculate
+	Machine classification is an important area of machine learning, aiming to classify samples based on their input features. A classification model can be expressed as
+	$\hat{y} = model(X)$, where $X \in \mathbb{R}^n$.
+	The training set is used to determine the model parameters, while the test set is used to evaluate the model's performance. Various classification algorithms have been developed, including decision trees, SVMs, and others.
+	
+	This paper investigates Naive Bayes Classification (NB) and compares it with other classification methods. A direct implementation of NB may suffer from the curse of dimensionality, which can significantly degrade its performance and even render it ineffective. This issue arises because $P(c)$ or $P(x)$ may become zero when the dataset contains no corresponding samples, potentially leading to incorrect class predictions.
+	
+	This report investigates how to mitigate the curse of dimensionality and improve the effectiveness of NB.
+	
+	
+	\section{Extending Naive Bayes Classification}
+	
+	\subsection{High-dimensional NB}
+	
+	NB aims to calculate
 	\[
 	c = \arg\max_c P(c \mid x)
 	= \arg\max_c P(x \mid c)P(c),
 	\]
-	where $x$ denotes the value of the input feature $X$, and $c$ refers to the class or label predicted by the model. To enhance its practical applicability, NBC must be extended to handle high-dimensional feature spaces. Specifically,
+	where $x$ denotes the value of the input feature $X$, and $c$ refers to the class or label predicted by the model. To enhance its practical applicability, NB must be extended to handle high-dimensional feature spaces. Specifically,
 	\[
 	c = \arg\max_c P(c \mid x_1, x_2, \ldots)
 	= \arg\max_c P(x_1, x_2, \ldots \mid c)P(c),
@@ -37,16 +47,19 @@
 	To calculate $P(x_1, x_2, \ldots \mid c)$, we introduce the independence assumption, which states that all input features $x_1, x_2, \ldots$ are conditionally independent given the class $c$. Accordingly,
 	\begin{equation}
 		\label{equ:p}
-	P(x_1, x_2, \ldots \mid c)
-	= \prod_{i=1}^{n} P(x_i \mid c).
+		P(x_1, x_2, \ldots \mid c)
+		= \prod_{i=1}^{n} P(x_i \mid c).
 	\end{equation}
+	
 	For each feature $x_i$, we search the dataset and count the number of entries, denoted by $N_{ic}$, in which the corresponding feature value and class label equal $x_i$ and $c$, respectively. The conditional probability is then estimated as
 	\[
 	P(x_i \mid c) = \frac{N_{ic}}{N_c}.
 	\]
 	
+	
 	\subsection{Laplace smoothing}
-	To prevent $P(x_i \mid c)$ from becoming zero, Laplace smoothing (LS) is introduced. Instead of calculating $ P(x_i \mid c) = \frac{N_{ic}}{N_c} $ ,Laplace smoothing adds a smoothing term to the numerator and adjusts the denominator accordingly:
+	
+	To prevent $P(x_i \mid c)$ from becoming zero, Laplace smoothing (LS) is introduced. Instead of calculating $P(x_i \mid c) = \frac{N_{ic}}{N_c}$, Laplace smoothing adds a smoothing term to the numerator and adjusts the denominator accordingly:
 	\[
 	P(x_i \mid c)
 	= \frac{N_{ic} + \alpha}{N_c + \alpha K},
@@ -54,96 +67,172 @@
 	where $\alpha$ is the smoothing parameter and $K$ is the number of possible feature values.
 	
 	The rationale for using Laplace smoothing is that it is equivalent to adding $K$ entries to the dataset, with each entry representing one of the possible feature values.
-
-
-\section{Exploration on Real-World Data}
-
+	
+	
+	\section{Exploration on Real-World Data}
+	
 	\subsection{Modeling Continuous-Valued Data}
 	
-		Although discretization enables the Naive Bayes classifier (NBC) to handle numerical features, real-world datasets often contain continuous-valued attributes. Discretization may result in information loss and introduce sensitivity to the selection of bin boundaries. To address these limitations, we extend the NBC to continuous numerical data by adopting the Gaussian Naive Bayes (GNB) model.
-		
-		Specifically, GNB assumes that, conditioned on the class label, each continuous feature follows a Gaussian distribution. For a feature $x_i$ and class label $y=c$, the conditional probability density is defined as
-		\begin{equation}
-			p(x_i \mid y=c)
-			=
-			\frac{1}{\sqrt{2\pi\sigma_{ic}^{2}}}
-			\exp\left(
-			-\frac{(x_i-\mu_{ic})^2}{2\sigma_{ic}^{2}}
-			\right),
-		\end{equation}
-		where $\mu_{ic}$ and $\sigma_{ic}^{2}$ denote the mean and variance of feature $x_i$ among the training instances belonging to class $c$, respectively.
-		
-		For each class $c$, the mean and variance of each continuous feature $x_i$ are estimated using the corresponding training samples. Specifically, the class-conditional mean and variance are calculated as
-		\[
-		\mu_{ic}=\frac{1}{N_c}\sum_{n:y_n=c}x_{ni},
-		\]
-		and
-		\[
-		\sigma_{ic}^{2}=\frac{1}{N_c}\sum_{n:y_n=c}(x_{ni}-\mu_{ic})^2,
-		\]
-		where $N_c$ denotes the number of training samples belonging to class $c$. These estimates are subsequently used to construct the Gaussian probability density for each feature conditioned on the class label.
-		
-		The class-specific means and variances are thus estimated directly from the training data. By modeling continuous features using Gaussian probability densities, GNB can process numerical attributes without requiring discretization. This provides a straightforward extension of NBC for evaluating classification performance on real-world datasets.
-		
+	Although discretization enables the Naive Bayes classifier (NB) to handle numerical features, real-world datasets often contain continuous-valued attributes. Discretization may result in information loss and introduce sensitivity to the selection of bin boundaries. To address these limitations, we extend the NB to continuous numerical data by adopting the Gaussian Naive Bayes (GNB) model.
+	
+	Specifically, GNB assumes that, conditioned on the class label, each continuous feature follows a Gaussian distribution. For a feature $x_i$ and class label $y=c$, the conditional probability density is defined as
+	\begin{equation}
+		p(x_i \mid y=c)
+		=
+		\frac{1}{\sqrt{2\pi\sigma_{ic}^{2}}}
+		\exp\left(
+		-\frac{(x_i-\mu_{ic})^2}{2\sigma_{ic}^{2}}
+		\right),
+	\end{equation}
+	where $\mu_{ic}$ and $\sigma_{ic}^{2}$ denote the mean and variance of feature $x_i$ among the training instances belonging to class $c$, respectively.
+	
+	For each class $c$, the mean and variance of each continuous feature $x_i$ are estimated using the corresponding training samples. Specifically, the class-conditional mean and variance are calculated as
+	\[
+	\mu_{ic}=\frac{1}{N_c}\sum_{n:y_n=c}x_{ni},
+	\]
+	and
+	\[
+	\sigma_{ic}^{2}=\frac{1}{N_c}\sum_{n:y_n=c}(x_{ni}-\mu_{ic})^2,
+	\]
+	where $N_c$ denotes the number of training samples belonging to class $c$. These estimates are subsequently used to construct the Gaussian probability density for each feature conditioned on the class label.
+	
+	The class-specific means and variances are thus estimated directly from the training data. By modeling continuous features using Gaussian probability densities, GNB can process numerical attributes without requiring discretization. This provides a straightforward extension of NB for evaluating classification performance on real-world datasets.
+	
+	
 	\subsection{Reconsidering the Independence Assumption}
 	
-		Our NBC assumes that the features $x_i \in X$ are mutually independent. However, in real-world datasets, complex dependencies may exist among features. Specifically, a feature may be expressed as a function of other features:
-		\[
-		x_i = f(x_{k_1}, x_{k_2}, \ldots), \quad i \in [1,n],
-		\]
-		which may lead to
-		\[
-		P(x_i = k)
-		= P(f(x_{k_1}, x_{k_2}, \ldots)=k)
-		= P(x_{k_1}, x_{k_2}, \ldots).
-		\]
-		This suggests that the probability associated with $x_i$ may be dependent on the probabilities of the features from which it is derived. Consequently, including $P(x_i)$ in \autoref{equ:p} may result in redundant probability calculations. Such double counting may lead to overconfidence in the predicted probability of a particular class.
-		
-\begin{table}[htbp]
-	\centering
-	\caption{Performance Comparison of Different Classifiers}
-	\label{tab:classifier_comparison1}
-	\begin{tabular}{lc}
-		\toprule
-		\textbf{Classifier} & \textbf{Score} \\
-		\midrule
-		Support Vector Machine (SVM) & 0.8734 \\
-		Gradient Boosting (GB) & 0.8717 \\
-		Logistic Regression (LR) & 0.8703 \\
-		Random Forest (RF) & 0.8600 \\
-		Extra Trees Classifier (ET) & 0.8556 \\
-		Decision Tree (DT) & 0.8546 \\
-		\textbf{Naive Bayes with LS(NB-LS)(Ours)} & \textbf{0.8384} \\
-		\textbf{Naive Bayes without LS(NB)(Ours)} & \textbf{0.8384} \\
-		Adaptive Boosting (AdaBoost) & 0.8002 \\
-		K-Nearest Neighbors (KNN) & 0.7547 \\
-		\bottomrule
-	\end{tabular}
-\end{table}
-\begin{table}[htbp]
-	\centering
-	\caption{Performance Comparison of Different Classifiers: On raw dataset}
-	\label{tab:classifier_comparison2}
-	\begin{tabular}{lc}
-		\toprule
-		\textbf{Classifier} & \textbf{Score} \\
-		\midrule
-		Support Vector Machine (SVM) & 0.9295 \\
-		Logistic Regression (LR) & 0.9278 \\
-		Extra Trees Classifier (ET) & 0.9229 \\
-		Gradient Boosting (GB) & 0.9224 \\
-		Random Forest (RF) & 0.9222 \\
-		K-Nearest Neighbors (KNN) & 0.9182 \\
-		\textbf{Naive Bayes (NB)} & \textbf{0.8984} \\
-		Decision Tree (DT) & 0.8891 \\
-		Adaptive Boosting (AdaBoost) & 0.8382 \\
-		\bottomrule
-	\end{tabular}
-\end{table}
-
-\section{Experiment}
-	We trained the NB classifier on a preprocessed dataset containing 9,526 instances, in which the data points were discretized. We also compared its performance with that of other established machine learning classification algorithms implemented in \textbf{scikit-learn}, a Python machine learning library. All models were evaluated on a test dataset containing 4,085 instances. The results are presented in \autoref{tab:classifier_comparison1}. In addition, we evaluated all methods on the raw dataset, in which the feature values remained continuous numerical data. The corresponding results are presented in \autoref{tab:classifier_comparison2}.
+	Our NB assumes that the features $x_i \in X$ are mutually independent. However, in real-world datasets, complex dependencies may exist among features. Specifically, a feature may be expressed as a function of other features:
+	\[
+	x_i = f(x_{k_1}, x_{k_2}, \ldots), \quad i \in [1,n],
+	\]
+	which may lead to
+	\[
+	P(x_i = k)
+	= P(f(x_{k_1}, x_{k_2}, \ldots)=k)
+	= P(x_{k_1}, x_{k_2}, \ldots).
+	\]
+	This suggests that the probability associated with $x_i$ may be dependent on the probabilities of the features from which it is derived. Consequently, including $P(x_i)$ in \autoref{equ:p} may result in redundant probability calculations. Such double counting may lead to overconfidence in the predicted probability of a particular class.
 	
-	The results in \autoref{tab:classifier_comparison1} indicate that LS has only a marginal influence on NB's performance when the dataset is sufficiently large. The results in \autoref{tab:classifier_comparison2} further suggest that the same model performs better on continuous-valued data. This improvement may be attributed to the information loss introduced by discretization, which can discard useful information and consequently reduce classification accuracy.
-		
+	
+	\section{Experiment}
+	\subsection{Dataset Description}
+	Our dataset is extended from ICU-Bean dataset, which is typical used for evaluating classification algorithm. The original dataset if comprised of 13611 instances, each item containing 17 features. The preprocessed datasets are sampled from the original one and discretized into discrete numerical values for basic experiments. The dataset setting are presented on \autoref{tab:dataset1}. 
+	
+		\begin{table}[htbp]
+			\centering
+			\caption{Dataset Information}
+			\label{tab:dataset1}
+			\begin{threeparttable}
+				\begin{tabular}{lcc}
+					\toprule
+					\textbf{Dataset} & \textbf{Size} & \textbf{Percentage} \\
+					\midrule
+					BeanTrain      & 9526  & \textbf{Discretized} \\
+					BeanTrain1000  & 1000  & \textbf{Discretized} \\
+					BeanTest       & 4085  & \textbf{Discretized} \\
+					BeanRaw        & 13611 & \textbf{Continuous} \\
+					\bottomrule
+				\end{tabular}
+				\begin{tablenotes}[flushleft]
+					\footnotesize
+					\item \textbf{Discretized} denotes that the dataset is discretized.
+					\item \textbf{Raw} means that the dataset is original.
+				\end{tablenotes}
+			\end{threeparttable}
+		\end{table}
+	
+	\subsection{Basic Experiment}
+	To investigate the effect of training dataset size on classification accuracy (\autoref{tab:dataset1}), we trained the Naive Bayes (NB) classifier on BeanTrain and BeanTrain1000 and evaluated both models on BeanTest. The results are presented in \autoref{tab:test1}. The results suggest that a larger training dataset can improve classification accuracy. Furthermore, Laplace smoothing (LS) appears to be more beneficial when the training dataset is smaller. This may be attributed to the increased likelihood of observing feature values that are absent from a limited training sample, which can lead to zero probability estimates. By introducing a smoothing term, LS mitigates this issue and may therefore provide greater benefits when training data are scarce.
+	
+	\begin{table}[htbp]
+		\centering
+		\caption{Dataset Information}
+		\label{tab:test1}
+		\begin{threeparttable}
+			\begin{tabular}{lcc}
+				\toprule
+				\textbf{Model} & \textbf{BeanTrain} & \textbf{BeanTrain1000} \\
+				\midrule
+				NB-LS($ \alpha = 1 $) & 0.8384 & 0.8355 \\
+				NB-LS($ \alpha = 2 $) & 0.8387 & \textbf{0.8367} \\
+				NB-LS($ \alpha = 3 $) & 0.8387 & 0.8365 \\
+				NB-LS($ \alpha = 4 $) & \textbf{0.8389} & 0.8348 \\
+				NB    & 0.8384 & 0.8250 \\
+				
+				\bottomrule
+			\end{tabular}
+			\begin{tablenotes}[flushleft]
+				\footnotesize
+				\item \textbf{NB-LS} denotes Naive Bayes \textbf{with} LS,
+				\item \textbf{NB} denotes Naive Bayes \textbf{without} LS.
+			\end{tablenotes}
+		\end{threeparttable}
+	\end{table}
+	
+	\subsection{Extension}
+	We also compared NB's performance with that of other established machine learning classification algorithms implemented in \textbf{scikit-learn}, a Python machine learning library. All models were evaluated on a test dataset containing 4,085 instances. The results are presented in \autoref{tab:classifier_comparison1}. In addition, we evaluated all methods on the raw dataset, in which the feature values remained continuous numerical data. The corresponding results are presented in \autoref{tab:classifier_comparison2}.
+	
+	The results in \autoref{tab:classifier_comparison2} suggest that the same model performs better on continuous-valued data. This improvement may be attributed to the information loss introduced by discretization, which can discard useful information and consequently reduce classification accuracy. 
+	
+	\begin{table}[htbp]
+		\centering
+		\caption{Performance Comparison of Different Classifiers}
+		\label{tab:classifier_comparison1}
+		\begin{threeparttable}
+			\begin{tabular}{lc}
+				\toprule
+				\textbf{Classifier} & \textbf{Score} \\
+				\midrule
+				Support Vector Machine (SVM) & 0.8734 \\
+				Gradient Boosting (GB) & 0.8717 \\
+				Logistic Regression (LR) & 0.8703 \\
+				Random Forest (RF) & 0.8600 \\
+				Extra Trees Classifier (ET) & 0.8556 \\
+				Decision Tree (DT) & 0.8546 \\
+				\textbf{Naive Bayes with LS(NB-LS)(Ours)} & \textbf{0.8384} \\
+				\textbf{Naive Bayes without LS(NB)(Ours)} & \textbf{0.8384} \\
+				Adaptive Boosting (AdaBoost) & 0.8002 \\
+				K-Nearest Neighbors (KNN) & 0.7547 \\
+				\bottomrule
+			\end{tabular}
+			\begin{tablenotes}[flushleft]
+				\footnotesize
+				\item Trained and Tested on \textbf{preprocessed} Bean-ICU dataset,
+				\item train set: 9526 instances,
+				\item test set: 4085 instances.
+			\end{tablenotes}
+		\end{threeparttable}
+	\end{table}
+	
+	\begin{table}[htbp]
+		\centering
+		\caption{Performance Comparison of Different Classifiers}
+		\label{tab:classifier_comparison2}
+		\begin{threeparttable}
+			\begin{tabular}{lc}
+				\toprule
+				\textbf{Classifier} & \textbf{Score} \\
+				\midrule
+				Support Vector Machine (SVM) & 0.9295 \\
+				Logistic Regression (LR) & 0.9278 \\
+				Extra Trees Classifier (ET) & 0.9229 \\
+				Gradient Boosting (GB) & 0.9224 \\
+				Random Forest (RF) & 0.9222 \\
+				K-Nearest Neighbors (KNN) & 0.9182 \\
+				\textbf{Naive Bayes (NB)} & \textbf{0.8984} \\
+				Decision Tree (DT) & 0.8891 \\
+				Adaptive Boosting (AdaBoost) & 0.8382 \\
+				\bottomrule
+			\end{tabular}
+			\begin{tablenotes}[flushleft]
+				\footnotesize
+				\item Trained and Tested on \textbf{raw} Bean-ICU dataset,
+				\item train set: 9526 instances,
+				\item test set: 4085 instances.
+			\end{tablenotes}
+		\end{threeparttable}
+	\end{table}
+	
+	\subsection{Model Parameters Setting}
+		Throughout the experiments above, we do not change the default parameters setting from \textbf{scikit-learn}. The basic NB model is crafted without 
 \end{document}

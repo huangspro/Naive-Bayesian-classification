@@ -1,10 +1,11 @@
 class NaiveBayesianClassificator:
-    def __init__(self, dataset, LS = True):
+    def __init__(self, dataset, LS = True, alpha = 1):
         self.p_c = {"SEKER": 0, "BARBUNYA": 0, "BOMBAY": 0, "CALI": 0, "DERMASON": 0, "HOROZ": 0, "SIRA": 0}
         self.p_xi_c = {}
         self.xi = []
         self.LS = LS
         self.dataset = dataset
+        self.alpha = alpha
         
     def fit(self):
         # count features
@@ -28,7 +29,7 @@ class NaiveBayesianClassificator:
         # self.p_xi_c: {(classname, feature_index, feature_value)}
         for k, v in self.p_xi_c.items(): 
             if self.LS:
-                self.p_xi_c[k] = (self.p_xi_c[k] + 1) / (self.p_c[k[0]] + self.xi[k[1]])  # add sth 
+                self.p_xi_c[k] = (self.p_xi_c[k] + 1*self.alpha) / (self.p_c[k[0]] + self.xi[k[1]]*self.alpha)  # add sth 
             else:
                 self.p_xi_c[k] = self.p_xi_c[k] / self.p_c[k[0]]
         for k, v in self.p_c.items():
