@@ -114,7 +114,7 @@
 	This suggests that the probability associated with $x_i$ may be dependent on the probabilities of the features from which it is derived. Consequently, including $P(x_i)$ in \autoref{equ:p} may result in redundant probability calculations. Such double counting may lead to overconfidence in the predicted probability of a particular class.
 	
 	
-	\section{Experiment}
+	\section{Basic Experiment}
 	\subsection{Dataset Description}
 	Our dataset is extended from ICU-Bean dataset, which is typical used for evaluating classification algorithm. The original dataset if comprised of 13611 instances, each item containing 17 features. The preprocessed datasets are sampled from the original one and discretized into discrete numerical values for basic experiments. The dataset setting are presented on \autoref{tab:dataset1}. 
 	
@@ -141,8 +141,9 @@
 			\end{threeparttable}
 		\end{table}
 	
-	\subsection{Basic Experiment}
+	\subsection{Method}
 	To investigate the effect of training dataset size on classification accuracy (\autoref{tab:dataset1}), we trained the Naive Bayes (NB) classifier on BeanTrain and BeanTrain1000 and evaluated both models on BeanTest. The results are presented in \autoref{tab:test1}. The results suggest that a larger training dataset can improve classification accuracy. Furthermore, Laplace smoothing (LS) appears to be more beneficial when the training dataset is smaller. This may be attributed to the increased likelihood of observing feature values that are absent from a limited training sample, which can lead to zero probability estimates. By introducing a smoothing term, LS mitigates this issue and may therefore provide greater benefits when training data are scarce.
+	
 	
 	\begin{table}[htbp]
 		\centering
@@ -169,72 +170,49 @@
 		\end{threeparttable}
 	\end{table}
 	
-	\subsection{Extension}
-	We also compared NB's performance with that of other established machine learning classification algorithms implemented in \textbf{scikit-learn}, a Python machine learning library. All models were evaluated on a test dataset containing 4,085 instances. The results are presented in \autoref{tab:classifier_comparison1}. In addition, we evaluated all methods on the raw dataset, in which the feature values remained continuous numerical data. The corresponding results are presented in \autoref{tab:classifier_comparison2}.
 	
-	The results in \autoref{tab:classifier_comparison2} suggest that the same model performs better on continuous-valued data. This improvement may be attributed to the information loss introduced by discretization, which can discard useful information and consequently reduce classification accuracy. 
 	
-	\subsection{Model Parameters Setting}
-	Throughout the experiments above, we did not change the default parameters setting from \textbf{scikit-learn}.
+	\section{Extension}
+		To meet the requirement of the research homework, we firstly evaluated all the classification methods and choose the best one.
+	\subsection{Evaluate Different Algorithms}
+		We also compared NB's performance with that of other established machine learning classification algorithms implemented in \textbf{scikit-learn}, a Python machine learning library. All models were evaluated on a test dataset containing 4,085 instances. In addition, we evaluated all methods on the raw dataset, in which the feature values remained continuous numerical data. The corresponding results are presented in \autoref{tab:classifier_comparison}.
+		
+		The results suggest that the same model performs better on continuous-valued data. This improvement may be attributed to the information loss introduced by discretization, which can discard useful information and consequently reduce classification accuracy. 
+	
+	
 	
 	\begin{table}[htbp]
 		\centering
-		\caption{Performance Comparison of Different Classifiers}
-		\label{tab:classifier_comparison1}
+		\caption{Performance Comparison of Different Classifiers on Raw and Preprocessed Bean-ICU Datasets}
+		\label{tab:classifier_comparison}
 		\begin{threeparttable}
-			\begin{tabular}{lc}
+			\begin{tabular}{lcc}
 				\toprule
-				\textbf{Classifier} & \textbf{Score} \\
+				\textbf{Classifier} & \textbf{Preprocessed Dataset} & \textbf{Raw Dataset} \\
 				\midrule
-				Support Vector Machine (SVM) & 0.8734 \\
-				Gradient Boosting (GB) & 0.8717 \\
-				Logistic Regression (LR) & 0.8703 \\
-				Random Forest (RF) & 0.8600 \\
-				Extra Trees Classifier (ET) & 0.8556 \\
-				Decision Tree (DT) & 0.8546 \\
-				\textbf{Naive Bayes with LS(NB-LS)(Ours)} & \textbf{0.8384} \\
-				\textbf{Naive Bayes without LS(NB)(Ours)} & \textbf{0.8384} \\
-				Adaptive Boosting (AdaBoost) & 0.8002 \\
-				K-Nearest Neighbors (KNN) & 0.7547 \\
+				Support Vector Machine (SVM) & 0.8734 & 0.9295 \\
+				Gradient Boosting (GB) & 0.8717 & 0.9224 \\
+				Logistic Regression (LR) & 0.8703 & 0.9278 \\
+				Random Forest (RF) & 0.8600 & 0.9222 \\
+				Extra Trees Classifier (ET) & 0.8556 & 0.9229 \\
+				Decision Tree (DT) & 0.8546 & 0.8891 \\
+				Naive Bayes (NB) & 0.8384 & 0.8984 \\
+				Adaptive Boosting (AdaBoost) & 0.8002 & 0.8382 \\
+				K-Nearest Neighbors (KNN) & 0.7547 & 0.9182 \\
 				\bottomrule
 			\end{tabular}
 			\begin{tablenotes}[flushleft]
 				\footnotesize
-				\item Trained and Tested on \textbf{preprocessed} Bean-ICU dataset,
-				\item train set: 9526 instances,
-				\item test set: 4085 instances.
+				\item The models were trained and tested on the preprocessed and raw Bean-ICU datasets, respectively.
+				\item Training set: 9,526 instances; test set: 4,085 instances.
+				\item All classifiers were evaluated using the default hyperparameter settings provided by \texttt{scikit-learn}.
 			\end{tablenotes}
 		\end{threeparttable}
 	\end{table}
 	
-	\begin{table}[htbp]
-		\centering
-		\caption{Performance Comparison of Different Classifiers}
-		\label{tab:classifier_comparison2}
-		\begin{threeparttable}
-			\begin{tabular}{lc}
-				\toprule
-				\textbf{Classifier} & \textbf{Score} \\
-				\midrule
-				Support Vector Machine (SVM) & 0.9295 \\
-				Logistic Regression (LR) & 0.9278 \\
-				Extra Trees Classifier (ET) & 0.9229 \\
-				Gradient Boosting (GB) & 0.9224 \\
-				Random Forest (RF) & 0.9222 \\
-				K-Nearest Neighbors (KNN) & 0.9182 \\
-				\textbf{Naive Bayes (NB)} & \textbf{0.8984} \\
-				Decision Tree (DT) & 0.8891 \\
-				Adaptive Boosting (AdaBoost) & 0.8382 \\
-				\bottomrule
-			\end{tabular}
-			\begin{tablenotes}[flushleft]
-				\footnotesize
-				\item Trained and Tested on \textbf{raw} Bean-ICU dataset,
-				\item train set: 9526 instances,
-				\item test set: 4085 instances.
-			\end{tablenotes}
-		\end{threeparttable}
-	\end{table}
-	
-	
+	\subsection{Model Selection and Parameters Setting}
+		As shown in the results presented in \autoref{tab:classifier_comparison}, the Support Vector Machine (SVM) achieved the best overall performance among the classifiers evaluated. Therefore, SVM was selected as the final classification model, with data standardization adopted as the preprocessing method. Throughout the experiments, all classifiers were evaluated using the default hyperparameter settings provided by \texttt{scikit-learn}, without any additional hyperparameter tuning.
+		
+	\subsection{Analysis}
+		The main reason for SVM outperforming NB is that SVM does not require the independence assumption, which contributes to its stronger adaptability to real-world data. In addition, kernel functions enable SVM to fit highly complex data distributions, while NB may fail to adapt due to its limited tunable parameters and naive independence assumption.
 \end{document}
