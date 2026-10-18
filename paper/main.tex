@@ -24,7 +24,7 @@
 	
 	This paper investigates Naive Bayes Classification (NB) and compares it with other classification methods. A direct implementation of NB may suffer from the curse of dimensionality, which can significantly degrade its performance and even render it ineffective. This issue arises because $P(c)$ or $P(x)$ may become zero when the dataset contains no corresponding samples, potentially leading to incorrect class predictions.
 	
-	This report investigates how to mitigate the curse of dimensionality and improve the effectiveness of NB.
+	This report investigates how to mitigate the curse of dimensionality and improve the effectiveness of NB. The code of our project was stored on \textbf{\url{https://github.com/huangspro/Naive-Bayesian-classification}}
 	
 	
 	\section{Extending Naive Bayes Classification}
@@ -174,6 +174,9 @@
 	
 	The results in \autoref{tab:classifier_comparison2} suggest that the same model performs better on continuous-valued data. This improvement may be attributed to the information loss introduced by discretization, which can discard useful information and consequently reduce classification accuracy. 
 	
+	\subsection{Model Parameters Setting}
+	Throughout the experiments above, we did not change the default parameters setting from \textbf{scikit-learn}.
+	
 	\begin{table}[htbp]
 		\centering
 		\caption{Performance Comparison of Different Classifiers}
@@ -233,6 +236,5 @@
 		\end{threeparttable}
 	\end{table}
 	
-	\subsection{Model Parameters Setting}
-		Throughout the experiments above, we do not change the default parameters setting from \textbf{scikit-learn}. The basic NB model is crafted without 
+	
 \end{document}
